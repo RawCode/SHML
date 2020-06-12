@@ -2,14 +2,28 @@ package ru.rc.shml;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.LdcInsnNode;
+import org.objectweb.asm.tree.MethodNode;
+
 import sun.misc.Unsafe;
 
 public class ENTRY 
@@ -71,12 +85,11 @@ public class ENTRY
 			return null;
 		}
 		
-		
 	    //this is JVM entry point, all calls land here
 		//ever from native
 	    public Class<?> loadClass(String name) throws ClassNotFoundException
 	    {
-			//System.out.println("loadClass=" + name);
+			System.out.println("loadClass=" + name);
 			
 			Class <?> RET = super.findLoadedClass(name);
 			
@@ -141,8 +154,36 @@ public class ENTRY
 					raw[i++] = (byte) rawstream.read();
 				}
 				
-				//System.out.println("image size " + b);
-				return unsafe.defineClass(name, raw, 0, size,this,null);
+				
+				String stockzevaporation = "reduceStorageItemsOnSeize";
+				String shipclassname = "fi.bugbyte.spacehaven.world.Ship";
+				
+				if (name.equals(shipclassname))
+				{
+					ClassReader reader = new ClassReader(raw);
+					ClassNode node = new ClassNode();
+					reader.accept(node,0);
+					
+					List<MethodNode> methods = node.methods;
+					
+					for (MethodNode mv : methods)
+					{
+						if (mv.name.equals(stockzevaporation))
+						{
+							mv.instructions = new InsnList();
+							mv.instructions.add(new InsnNode(Opcodes.RETURN));
+							break;
+						}
+					}
+					
+				    ClassWriter writer = new ClassWriter(1);
+				    node.accept(writer);
+				    
+				    byte[] processed = writer.toByteArray();
+				    
+				    return unsafe.defineClass(name, processed, 0, processed.length,this,null);
+				}
+				return unsafe.defineClass(name, raw, 0, raw.length,this,null);
 			} 
 			catch (Exception e) 
 			{
@@ -151,6 +192,14 @@ public class ENTRY
 			}
 			return null;
 	    }
+	}
+	
+	public static void main2(String[] args) throws InterruptedException
+	{
+	}
+	
+	public static void main3()
+	{
 	}
 
 	public static void main(String[] args) throws InterruptedException
