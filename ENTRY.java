@@ -89,7 +89,7 @@ public class ENTRY
 		//ever from native
 	    public Class<?> loadClass(String name) throws ClassNotFoundException
 	    {
-			System.out.println("loadClass=" + name);
+			//System.out.println("loadClass=" + name);
 			
 			Class <?> RET = super.findLoadedClass(name);
 			
@@ -160,6 +160,7 @@ public class ENTRY
 				
 				if (name.equals(shipclassname))
 				{
+					System.out.println("fi.bugbyte.spacehaven.world.Ship");
 					ClassReader reader = new ClassReader(raw);
 					ClassNode node = new ClassNode();
 					reader.accept(node,0);
@@ -170,6 +171,7 @@ public class ENTRY
 					{
 						if (mv.name.equals(stockzevaporation))
 						{
+							System.out.println("reduceStorageItemsOnSeize");
 							mv.instructions = new InsnList();
 							mv.instructions.add(new InsnNode(Opcodes.RETURN));
 							break;
