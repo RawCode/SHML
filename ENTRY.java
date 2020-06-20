@@ -42,7 +42,18 @@ public class ENTRY
 		}
 		try 
 		{
-			ucl.loadClass("fi.bugbyte.spacehaven.steam.SpacehavenSteam").getDeclaredMethods()[0].invoke(null, new Object[1]);
+			Object[] o = new Object[1];
+			String[] ss = new String[1];
+			ss[0] = "contentEditor";
+			o[0] = ss;
+			ucl.loadClass("fi.bugbyte.spacehaven.MainClass").getDeclaredMethods()[0].invoke(null, o);
+			
+			int i =0;
+			for (Method m : ucl.loadClass("fi.bugbyte.spacehaven.MainClass").getDeclaredMethods())
+			{
+				System.out.println(i++ + " " + m);
+			}
+			
 		} 
 		catch (Exception e)
 		{

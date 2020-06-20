@@ -146,37 +146,8 @@ public class UnsafeURLClassLoader extends URLClassLoader
 					raw[i++] = (byte) rawstream.read();
 				}
 				
+				raw = PatchHardcoded.walk(name, raw);
 				
-				String stockzevaporation = "reduceStorageItemsOnSeize";
-				String shipclassname = "fi.bugbyte.spacehaven.world.Ship";
-				
-				if (name.equals(shipclassname))
-				{
-					System.out.println("fi.bugbyte.spacehaven.world.Ship");
-					ClassReader reader = new ClassReader(raw);
-					ClassNode node = new ClassNode();
-					reader.accept(node,0);
-					
-					List<MethodNode> methods = node.methods;
-					
-					for (MethodNode mv : methods)
-					{
-						if (mv.name.equals(stockzevaporation))
-						{
-							System.out.println("reduceStorageItemsOnSeize");
-							mv.instructions = new InsnList();
-							mv.instructions.add(new InsnNode(Opcodes.RETURN));
-							break;
-						}
-					}
-					
-				    ClassWriter writer = new ClassWriter(1);
-				    node.accept(writer);
-				    
-				    byte[] processed = writer.toByteArray();
-				    
-				    return unsafe.defineClass(name, processed, 0, processed.length,this,null);
-				}
 				return unsafe.defineClass(name, raw, 0, raw.length,this,null);
 			} 
 			catch (Exception e) 
